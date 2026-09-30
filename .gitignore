@@ -67,3 +67,7 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Local executables produced by test_runner.sh
+app
+blackjack_tests
