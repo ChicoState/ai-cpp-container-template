@@ -1,24 +1,34 @@
-# cpp-container-template
+# Command-Line Blackjack
 
-## Getting Started
+A basic single-player C++ blackjack game with ASCII cards, automatic scoring,
+and an automated dealer.
 
-This repository is compatible with [cpp-container](https://github.com/ChicoState/cpp-container). If not already built on your machine, clone and build it.
-
-Run the container:
-
-```bash
-docker run -v "$(pwd)":/usr/src -it cpp-container
-```
-
-Run the application interactively in a shell:
+## Build and run
 
 ```bash
-docker run -v "$(pwd)":/usr/src -it cpp-container sh
+g++ -std=c++17 -Wall -Wextra -pedantic main.cpp blackjack.cpp -o app
+./app
 ```
 
-## Structure
+Run the automated logic tests with:
 
-* `.agents` - AI agent configurations and skills (in `/skills` subdirectory) for this project
-* `.` - The root directory contains the C++ code for the application as well as necessary scripts
-* `specs` - Specification documentation
-* `tests` - Test code
+```bash
+./test_runner.sh
+```
+
+## Rules
+
+- A session begins with `$1,000.00`.
+- Enter a whole-dollar wager from `$1` through the available balance.
+- Every round uses a freshly shuffled 52-card deck.
+- The player may hit or stand. Hand totals are calculated automatically.
+- Aces count as 11 when possible and otherwise count as 1.
+- The dealer's second card remains hidden until the player stands or has a
+  blackjack. The dealer does not play after a player bust.
+- The dealer hits on 16 or below and stands on all 17s, including soft 17.
+- Standard wins pay 1:1, pushes return the wager, and natural blackjacks pay
+  3:2.
+- Reaching `$0.00` ends the game.
+
+This intentionally basic version does not include splitting, doubling down,
+insurance, surrender, or multi-deck shoes.
