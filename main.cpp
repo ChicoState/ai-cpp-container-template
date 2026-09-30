@@ -1,4 +1,9 @@
+#include "game.hpp"
+
+#include <iostream>
+
 int main() {
-  
-  return 0;
+    Game game(std::cin, std::cout);
+    game.run();
+    return 0;
 }
