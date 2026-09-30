@@ -38,6 +38,8 @@
 *.exe
 *.out
 *.app
+/app
+/donut_tests
 
 # Build directories
 build/
