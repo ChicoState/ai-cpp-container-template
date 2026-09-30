@@ -1,25 +1,55 @@
 #include "guess_my_number.hpp"
 
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#elif defined(__linux__)
+#include <unistd.h>
+#endif
+
+#include <cstdint>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
-#include <mach-o/dyld.h>
+#include <optional>
 #include <random>
 #include <string>
 #include <vector>
 
 namespace {
 
-std::filesystem::path scorePathForExecutable() {
+std::optional<std::filesystem::path> executablePath() {
+#if defined(__APPLE__)
   std::uint32_t bufferSize = 0;
   if (_NSGetExecutablePath(nullptr, &bufferSize) != -1 || bufferSize == 0) {
-    std::cerr << "Warning: could not resolve executable path; using the current "
-                 "directory for the high score.\n";
-    return std::filesystem::current_path() / "high_score.txt";
+    return std::nullopt;
   }
 
   std::vector<char> buffer(bufferSize);
   if (_NSGetExecutablePath(buffer.data(), &bufferSize) != 0) {
+    return std::nullopt;
+  }
+  return buffer.data();
+#elif defined(__linux__)
+  std::vector<char> buffer(256);
+  while (true) {
+    const ssize_t length = readlink("/proc/self/exe", buffer.data(),
+                                    buffer.size());
+    if (length < 0) {
+      return std::nullopt;
+    }
+    if (static_cast<std::size_t>(length) < buffer.size()) {
+      return std::string(buffer.data(), length);
+    }
+    buffer.resize(buffer.size() * 2);
+  }
+#else
+  return std::nullopt;
+#endif
+}
+
+std::filesystem::path scorePathForExecutable() {
+  const std::optional<std::filesystem::path> path = executablePath();
+  if (!path) {
     std::cerr << "Warning: could not resolve executable path; using the current "
                  "directory for the high score.\n";
     return std::filesystem::current_path() / "high_score.txt";
@@ -27,7 +57,7 @@ std::filesystem::path scorePathForExecutable() {
 
   std::error_code error;
   const std::filesystem::path executablePath =
-      std::filesystem::weakly_canonical(buffer.data(), error);
+      std::filesystem::weakly_canonical(*path, error);
   if (error) {
     std::cerr << "Warning: could not resolve executable path; using the current "
                  "directory for the high score.\n";
