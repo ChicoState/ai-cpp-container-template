@@ -1,24 +1,47 @@
-# cpp-container-template
+# Maze Escape
 
-## Getting Started
+A compact C++17 terminal adventure game. Navigate the maze, collect the key,
+avoid the moving hazard, and reach the exit as fast as you can.
 
-This repository is compatible with [cpp-container](https://github.com/ChicoState/cpp-container). If not already built on your machine, clone and build it.
+## Play
 
-Run the container:
-
-```bash
-docker run -v "$(pwd)":/usr/src -it cpp-container
-```
-
-Run the application interactively in a shell:
+Build with a C++17 compiler:
 
 ```bash
-docker run -v "$(pwd)":/usr/src -it cpp-container sh
+g++ -std=c++17 -Wall -Wextra -Wpedantic -Werror main.cpp game.cpp -o build/maze_game
+./build/maze_game
 ```
 
-## Structure
+Controls:
 
-* `.agents` - AI agent configurations and skills (in `/skills` subdirectory) for this project
-* `.` - The root directory contains the C++ code for the application as well as necessary scripts
-* `specs` - Specification documentation
-* `tests` - Test code
+- `W`, `A`, `S`, `D` — move one tile
+- `Q` — end the current run
+
+Symbols:
+
+- `P` — player
+- `K` — key; collect it to unlock the exit
+- `E` — exit
+- `H` — moving hazard
+- `#` — wall
+
+The timer starts on your first successful movement, remains running while you
+play, and freezes when the game ends. The hazard follows a deterministic route,
+so faster runs reward learning the maze and timing your path.
+
+## Test
+
+```bash
+./test_runner.sh
+```
+
+The test runner performs deterministic game-rule tests, a scripted winning
+playthrough, and the rule tests under AddressSanitizer and UndefinedBehavior
+Sanitizer.
+
+## Project Structure
+
+- `main.cpp` — terminal input/output and game loop
+- `game.h`, `game.cpp` — game state, rules, rendering, and timer logic
+- `tests/` — unit tests and the scripted terminal playthrough
+- `specs/` — MVP specification and implementation plan
